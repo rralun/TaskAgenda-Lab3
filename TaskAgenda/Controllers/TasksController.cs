@@ -17,15 +17,15 @@ namespace TaskAgenda.Controllers
         {
             this.context = context;
         }
-
+        /*
         // GET: api/Tasks
         [HttpGet]
         public IEnumerable<Task> Get()
         {
-            
+
             return context.Tasks;
         }
-
+        */
         // GET: api/Tasks/2 -----2 - view detail on task with id 2
         [HttpGet("{id}", Name = "Get")]
         public IActionResult Get(int id)
@@ -38,48 +38,43 @@ namespace TaskAgenda.Controllers
 
             return Ok(existing);
         }
-        // GET: api/Tasks/filtered
+       // GET: api/Tasks/filtered
         [HttpGet("filtered")]
-        public IEnumerable<Task> GetfilteredDate([FromBody] IntervalDate interval)
+        public IEnumerable<Task> GetfilteredDate([FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
-            DbSet<Task> list = TasksDbContext.Taskss;
-            IList<Task> result = new List<Task>();
-
-            foreach (Task task in list)
+            IQueryable<Task> result = context.Tasks(t => t.Deadline);
+            if (from == null && to == null)
             {
-                if (task.Deadline > interval.begin && task.Deadline < interval.end)
-                {
-                    System.Diagnostics.Debug.WriteLine(task.Status);
-                    result.Add(task);
-                }
+                return result;
+            }
+            if (from != null)
+            {
+                return result.Where(t => t.Deadline >= from); 
+            }
+            if (to != null)
+            {
+                return result.Where(t => t.Deadline <= to); 
             }
 
             return result;
         }
         
-     
 
-        public class IntervalDate
-        {
-            public DateTime begin { get; set; } 
-            public DateTime end { get; set; }
 
-        }
-       
         // POST: api/Tasks
         [HttpPost]
         public void Post([FromBody] Task task)
         {
-         
+
             context.Tasks.Add(task);
             context.SaveChanges();
         }
 
         // PUT: api/Tasks/
         [HttpPut("{id}")]
-        public IActionResult Put(int id,  [FromBody] Task task)
+        public IActionResult Put(int id, [FromBody] Task task)
         {
-            
+
             var existing = context.Tasks.AsNoTracking().FirstOrDefault(t => t.Id == id);
             if (existing == null)
             {
@@ -89,19 +84,21 @@ namespace TaskAgenda.Controllers
             }
             if (task.Status == "Closed")
             {
-                task.DateTimeClosedAt = task.Deadline;
+
+                task.DateTimeClosedAt = DateTime.Now;
                 context.SaveChanges();
                 return Ok(task);
             }
-            /*else
+            else
             {
-                task.DateTimeClosedAt  = null;
-            }*/
-            task.Id = id;  
+                //task.DateTimeClosedAt = DateTime? null;
+
+            }
+            task.Id = id;
             context.Tasks.Update(task);
             context.SaveChanges();
             return Ok(task);
-            
+
         }
 
         // DELETE: api/ApiWithActions

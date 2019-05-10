@@ -11,10 +11,10 @@ namespace TaskAgenda.Models
     {
         public TasksDbContext(DbContextOptions<TasksDbContext> options) : base(options)
         {
-
         }
+
+        // DbSet = Repository
         public DbSet<Task> Tasks { get; set; }
-        public static DbSet<Task> Taskss { get; set; }
 
     }
 }
