@@ -13,8 +13,8 @@ namespace TaskAgenda.Models
         {
 
         }
-
         public DbSet<Task> Tasks { get; set; }
+        public static DbSet<Task> Taskss { get; set; }
+
     }
 }
-

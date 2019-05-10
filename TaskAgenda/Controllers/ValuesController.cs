@@ -30,13 +30,13 @@ namespace TaskAgenda.Controllers
         {
         }
 
-        // PUT api/values/5
+        // PUT api/values/
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
-        // DELETE api/values/5
+        // DELETE api/values/
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
