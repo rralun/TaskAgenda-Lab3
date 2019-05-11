@@ -34,6 +34,8 @@ namespace TaskAgenda.Models
         public string Status { get; set; }
         public DateTime? DateTimeClosedAt { get; set; }
 
+        public List<Comment> Comments { get; set; }
+
         /*
         public class StringRangeAttribute : ValidationAttribute
         {

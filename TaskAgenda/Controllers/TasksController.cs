@@ -17,33 +17,33 @@ namespace TaskAgenda.Controllers
         {
             this.context = context;
         }
-        // GET: api/Tasks
-        [HttpGet]
-        public IEnumerable<Task> Get()
-        {
+        //// GET: api/Tasks
+        //[HttpGet]
+        //public IEnumerable<Task> Get()
+        //{
 
-            return context.Tasks;
-        }
-        public IEnumerable<Task> GetFilter([FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        //    return context.Tasks;
+        //}
+        [HttpGet]
+        public IEnumerable<Task> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to)
         {
-            IQueryable<Task> result = context.Tasks.Include(t => t.Deadline);
+            IQueryable<Task> result = context.Tasks.Include(t => t.Comments);
             if (from == null && to == null)
             {
                 return result;
             }
             if (from != null)
             {
-                return result.Where(t => t.Deadline >= from);
+                result = result.Where(t => t.Deadline >= from);
             }
             if (to != null)
             {
-                return result.Where(t => t.Deadline <= to);
+                result = result.Where(t => t.Deadline <= to);
             }
-
             return result;
         }
 
-              
+
         // GET: api/Tasks/2 -----2 - view detail on task with id 2
         [HttpGet("{id}", Name = "Get")]
         public IActionResult Get(int id)
@@ -56,26 +56,7 @@ namespace TaskAgenda.Controllers
 
             return Ok(existing);
         }
-       // GET: api/Tasks/filtered
-        [HttpGet("filtered")]
-        public IEnumerable<Task> GetfilteredDate([FromQuery] DateTime? from, [FromQuery] DateTime? to)
-        {
-            IQueryable<Task> result = context.Tasks.Include(t => t.Deadline);
-            if (from == null && to == null)
-            {
-                return result;
-            }
-            if (from != null)
-            {
-                return result.Where(t => t.Deadline >= from); 
-            }
-            if (to != null)
-            {
-                return result.Where(t => t.Deadline < to); 
-            }
-
-            return result;
-        }
+       
         
         // POST: api/Tasks
         [HttpPost]
