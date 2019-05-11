@@ -17,7 +17,6 @@ namespace TaskAgenda.Controllers
         {
             this.context = context;
         }
-        /*
         // GET: api/Tasks
         [HttpGet]
         public IEnumerable<Task> Get()
@@ -25,7 +24,26 @@ namespace TaskAgenda.Controllers
 
             return context.Tasks;
         }
-        */
+        public IEnumerable<Task> GetFilter([FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        {
+            IQueryable<Task> result = context.Tasks.Include(t => t.Deadline);
+            if (from == null && to == null)
+            {
+                return result;
+            }
+            if (from != null)
+            {
+                return result.Where(t => t.Deadline >= from);
+            }
+            if (to != null)
+            {
+                return result.Where(t => t.Deadline <= to);
+            }
+
+            return result;
+        }
+
+              
         // GET: api/Tasks/2 -----2 - view detail on task with id 2
         [HttpGet("{id}", Name = "Get")]
         public IActionResult Get(int id)
@@ -42,7 +60,7 @@ namespace TaskAgenda.Controllers
         [HttpGet("filtered")]
         public IEnumerable<Task> GetfilteredDate([FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
-            IQueryable<Task> result = context.Tasks(t => t.Deadline);
+            IQueryable<Task> result = context.Tasks.Include(t => t.Deadline);
             if (from == null && to == null)
             {
                 return result;
@@ -53,14 +71,12 @@ namespace TaskAgenda.Controllers
             }
             if (to != null)
             {
-                return result.Where(t => t.Deadline <= to); 
+                return result.Where(t => t.Deadline < to); 
             }
 
             return result;
         }
         
-
-
         // POST: api/Tasks
         [HttpPost]
         public void Post([FromBody] Task task)
@@ -91,12 +107,12 @@ namespace TaskAgenda.Controllers
             }
             else
             {
-                //task.DateTimeClosedAt = DateTime? null;
-
+                task.DateTimeClosedAt = null;
+                    
             }
             task.Id = id;
             context.Tasks.Update(task);
-            context.SaveChanges();
+           // context.SaveChanges();
             return Ok(task);
 
         }

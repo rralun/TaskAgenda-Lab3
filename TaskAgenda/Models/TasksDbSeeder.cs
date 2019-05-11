@@ -26,7 +26,7 @@ namespace TaskAgenda.Models
                     DateTimeAdded = DateTime.Parse("05/03/2019 09:00"),
                     Deadline = DateTime.Parse("05/31/2019 09:00"),
                     Importance = "Low",
-                    Status = "In progress",
+                    Status = "In_progress",
                     DateTimeClosedAt = DateTime.Parse(" 05/31/2019 09:00")
                 },
    
@@ -37,7 +37,7 @@ namespace TaskAgenda.Models
                     DateTimeAdded = DateTime.Parse("05/02/2019 12:00"),
                     Deadline = DateTime.Parse("06/10/2019 12:00"),
                     Importance = "Medium",
-                    Status = "In progress",
+                    Status = "In_progress",
                     DateTimeClosedAt = DateTime.Parse("06/10/2019 12:00")
                 },
                 new Task
@@ -58,7 +58,7 @@ namespace TaskAgenda.Models
                     DateTimeAdded = DateTime.Parse("05/04/2019 10:00"),
                     Deadline = DateTime.Parse("07/13/2019 11:00 "),
                     Importance = "High",
-                    Status = "In progress",
+                    Status = "In_progress",
                     DateTimeClosedAt = DateTime.Parse("07/13/2019 11:00 ")
                 }
             );

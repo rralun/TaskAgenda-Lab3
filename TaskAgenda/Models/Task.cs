@@ -6,6 +6,18 @@ using System.Threading.Tasks;
 
 namespace TaskAgenda.Models
 {
+    public enum Importance
+    {
+        Low,
+        Medium,
+        High
+    }
+    public enum Status
+    {
+        Open,
+        In_progress,
+        Closed
+    }
     public class Task
     {
         public int Id { get; set; }
@@ -14,14 +26,15 @@ namespace TaskAgenda.Models
         public DateTime DateTimeAdded { get; set; }
         public DateTime Deadline { get; set; }
         // importance: low, medium, high
-        [StringRange(AllowableValues = new[] { "Low", "Medium", "High" }, ErrorMessage = "Gender must be either 'low', 'medium' or 'high'")]
+        [EnumDataType(typeof(Importance))]
         public string Importance { get; set; }
         // status: open, in progress, closed
-        [StringRange(AllowableValues = new[] { "Open", "In progress", "Closed" }, ErrorMessage = "Gender must be either 'open', 'in progress' or 'closed'")]
+        //[StringRange(AllowableValues = new[] { "Open", "In progress", "Closed" }, ErrorMessage = "Gender must be either 'open', 'in progress' or 'closed'")]
+        [EnumDataType(typeof(Status))]
         public string Status { get; set; }
         public DateTime? DateTimeClosedAt { get; set; }
 
-
+        /*
         public class StringRangeAttribute : ValidationAttribute
         {
             public string[] AllowableValues { get; set; }
@@ -40,7 +53,7 @@ namespace TaskAgenda.Models
 
                 return new ValidationResult("Please enter a correct value. ");
             }
-        }
+        }*/
 
     }
 }
