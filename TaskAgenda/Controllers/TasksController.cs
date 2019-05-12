@@ -17,13 +17,14 @@ namespace TaskAgenda.Controllers
         {
             this.context = context;
         }
-        //// GET: api/Tasks
-        //[HttpGet]
-        //public IEnumerable<Task> Get()
-        //{
 
-        //    return context.Tasks;
-        //}
+
+        /// <summary>
+        /// Gets all the tasks.
+        /// </summary>
+        /// <param name="from">Optional, filter by minimum Deadline.</param>
+        /// <param name="to">Optional, filter by maximum Deadline.</param>
+        /// <returns>A list of Task objects.</returns>
         [HttpGet]
         public IEnumerable<Task> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to)
         {
@@ -48,7 +49,9 @@ namespace TaskAgenda.Controllers
         [HttpGet("{id}", Name = "Get")]
         public IActionResult Get(int id)
         {
-            var existing = context.Tasks.FirstOrDefault(task => task.Id == id);
+            var existing = context.Tasks
+                .Include(t => t.Comments)
+                .FirstOrDefault(task => task.Id == id);
             if (existing == null)
             {
                 return NotFound();
@@ -56,9 +59,33 @@ namespace TaskAgenda.Controllers
 
             return Ok(existing);
         }
-       
-        
+
+        /// <summary>
+        /// Add a task.
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///     POST / tasks 
+        ///         {
+        ///             "title": "Rapoarte- errori",
+        ///             "description": "Erori muuuulte",
+        ///             "dateTimeAdded": "2019/05/04 12:00",
+        ///             "deadline": "2019/05/31 17:00",
+        ///             "importance": "High",
+        ///             "status": "In_progress",
+        ///             "dateTimeClosedAt": "2019/05/31 18:00",
+        ///             "comments":[
+        ///	                {
+        ///		                "text": "to many errors",
+        ///		                "positive": true
+        ///                 }
+        ///	                ]
+        ///         }
+        /// </remarks>
+        /// <param name="task"></param>
         // POST: api/Tasks
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(400)]
         [HttpPost]
         public void Post([FromBody] Task task)
         {
