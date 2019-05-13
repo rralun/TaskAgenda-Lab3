@@ -5,6 +5,7 @@ using TaskAgenda.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TaskAgenda.Services;
 
 namespace TaskAgenda.Controllers
 {
@@ -12,10 +13,10 @@ namespace TaskAgenda.Controllers
     [ApiController]
     public class TasksController : ControllerBase
     {
-        private TasksDbContext context;
-        public TasksController(TasksDbContext context)
+        private ITaskService taskService;
+        public TasksController(ITaskService taskService)
         {
-            this.context = context;
+            this.taskService = taskService;
         }
 
 
@@ -28,20 +29,7 @@ namespace TaskAgenda.Controllers
         [HttpGet]
         public IEnumerable<Task> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to)
         {
-            IQueryable<Task> result = context.Tasks.Include(t => t.Comments);
-            if (from == null && to == null)
-            {
-                return result;
-            }
-            if (from != null)
-            {
-                result = result.Where(t => t.Deadline >= from);
-            }
-            if (to != null)
-            {
-                result = result.Where(t => t.Deadline <= to);
-            }
-            return result;
+            return taskService.GetAll(from, to);     
         }
 
 
@@ -49,15 +37,14 @@ namespace TaskAgenda.Controllers
         [HttpGet("{id}", Name = "Get")]
         public IActionResult Get(int id)
         {
-            var existing = context.Tasks
-                .Include(t => t.Comments)
-                .FirstOrDefault(task => task.Id == id);
-            if (existing == null)
+            var found = taskService.GetById(id);
+
+            if (found == null)
             {
-                return NotFound();
+                return NotFound();  //tine de logica UI (ce sa imi returneze pe UI). Fiind Http -> este cu not found si ok
             }
 
-            return Ok(existing);
+            return Ok(found);
         }
 
         /// <summary>
@@ -89,54 +76,27 @@ namespace TaskAgenda.Controllers
         [HttpPost]
         public void Post([FromBody] Task task)
         {
-
-            context.Tasks.Add(task);
-            context.SaveChanges();
+            taskService.Create(task);
         }
 
         // PUT: api/Tasks/
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Task task)
         {
-
-            var existing = context.Tasks.AsNoTracking().FirstOrDefault(t => t.Id == id);
-            if (existing == null)
-            {
-                context.Tasks.Add(task);
-                context.SaveChanges();
-                return Ok(task);
-            }
-            if (task.Status == "Closed")
-            {
-
-                task.DateTimeClosedAt = DateTime.Now;
-                context.SaveChanges();
-                return Ok(task);
-            }
-            else
-            {
-                task.DateTimeClosedAt = null;
-                    
-            }
-            task.Id = id;
-            context.Tasks.Update(task);
-            //context.SaveChanges();
-            return Ok(task);
-
+            var result = taskService.Upsert(id, task);
+            return Ok(result);
         }
 
         // DELETE: api/ApiWithActions
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existing = context.Tasks.FirstOrDefault(task => task.Id == id);
-            if (existing == null)
+            var result = taskService.Delete(id);
+            if (result == null)
             {
                 return NotFound();
-            }
-            context.Tasks.Remove(existing);
-            context.SaveChanges();
-            return Ok();
+            } 
+            return Ok(result);  //o sa imi returneze chiar obiectul sters
         }
     }
 }
