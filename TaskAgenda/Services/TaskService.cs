@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 //using System.Threading.Tasks;
 using TaskAgenda.Models;
+using TaskAgenda.ViewModels;
 
 namespace TaskAgenda.Services
 {
@@ -15,9 +16,9 @@ namespace TaskAgenda.Services
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        IEnumerable<Task> GetAll(DateTime? from=null, DateTime? to=null);
+        IEnumerable<TaskGetModel> GetAll(DateTime? from=null, DateTime? to=null);
         Task GetById(int id);
-        Task Create(Task task);
+        Task Create(TaskPostModel task);
         Task Upsert(int id, Task task);
         Task Delete(int id);
 
@@ -31,11 +32,12 @@ namespace TaskAgenda.Services
         {
             this.context = context;
         }
-        public Task Create(Task task)
+        public Task Create(TaskPostModel task)
         {
-            context.Tasks.Add(task);
+            Task toAdd = TaskPostModel.ToTask(task);
+            context.Tasks.Add(toAdd);
             context.SaveChanges();
-            return task;
+            return toAdd;
         }
 
         public Task Delete(int id)
@@ -51,13 +53,15 @@ namespace TaskAgenda.Services
             return existing;
         }
 
-        public IEnumerable<Task> GetAll(DateTime? from=null, DateTime? to=null)
+        public IEnumerable<TaskGetModel> GetAll(DateTime? from=null, DateTime? to=null)
         {
-            IQueryable<Task> result = context.Tasks.Include(t => t.Comments);
+            IQueryable<Task> result = context
+                .Tasks
+                .Include(t => t.Comments);
             if (from == null && to == null)
             {
-                return result;
-            }
+                return result.Select(t => TaskGetModel.FromTask(t));
+                        }
             if (from != null)
             {
                 result = result.Where(t => t.Deadline >= from);
@@ -66,7 +70,7 @@ namespace TaskAgenda.Services
             {
                 result = result.Where(t => t.Deadline <= to);
             }
-            return result;
+            return result.Select(t => TaskGetModel.FromTask(t));
         }
 
         public Task GetById(int id)

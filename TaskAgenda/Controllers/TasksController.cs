@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskAgenda.Services;
+using TaskAgenda.ViewModels;
 
 namespace TaskAgenda.Controllers
 {
@@ -27,9 +28,9 @@ namespace TaskAgenda.Controllers
         /// <param name="to">Optional, filter by maximum Deadline.</param>
         /// <returns>A list of Task objects.</returns>
         [HttpGet]
-        public IEnumerable<Task> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to)
+        public IEnumerable<TaskGetModel> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to) //cu viewModel - voi avea in loc de<Task> -> <TaskGetModel>
         {
-            return taskService.GetAll(from, to);     
+            return taskService.GetAll(from, to);  //nu mai merge si atunci in Service trb sa am la GetAll ( <TaskGetModel>)    
         }
 
 
@@ -74,7 +75,7 @@ namespace TaskAgenda.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(400)]
         [HttpPost]
-        public void Post([FromBody] Task task)
+        public void Post([FromBody] TaskPostModel task)
         {
             taskService.Create(task);
         }
