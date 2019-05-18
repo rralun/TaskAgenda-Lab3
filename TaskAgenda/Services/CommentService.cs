@@ -27,12 +27,38 @@ namespace TaskAgenda.Services
 
         public IEnumerable<CommentGetModel> GetAllFiltered(string filter)
         {
+            bool filterComment = true;
+            if (string.IsNullOrEmpty(filter))
+                filterComment = false;
+
+            var 
             IQueryable<CommentGetModel> result = context
                 .Comments
                 .Select(c => CommentGetModel.DinTask(c))
                 .Where(c => c.Text.Contains(filter));
-            return result;
+            //if (filter.Equals(null))
+            //{
+            //    return result.Select(t => CommentGetModel.DinTask(comment);
+            //}
+          
+                return result;
 
+        }
+
+        public IEnumerable<CommentGetModel> GetAllComentsAndTask()
+        {
+            var order = from comment in context.Comments
+                        join task in context.Tasks
+                        on comment.TaskId equals task.Id
+                        select new CommentGetModel()
+                        {
+                           Id = comment.Id,
+                           Text = comment.Text,
+                           Important = comment.Important,
+                           TaskId = comment.TaskId
+                        };
+
+            return context.Comments.Select(comment => CommentGetModel.DinTask(comment));
         }
     }
 }

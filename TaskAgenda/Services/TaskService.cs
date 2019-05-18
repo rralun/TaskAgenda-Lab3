@@ -42,7 +42,9 @@ namespace TaskAgenda.Services
 
         public Task Delete(int id)
         {
-            var existing = context.Tasks.FirstOrDefault(task => task.Id == id);
+            var existing = context.Tasks
+                .Include(t => t.Comments)
+                .FirstOrDefault(task => task.Id == id);
             if (existing == null)
             {
                 return null;
@@ -52,7 +54,6 @@ namespace TaskAgenda.Services
 
             return existing;
         }
-
         public IEnumerable<TaskGetModel> GetAll(DateTime? from=null, DateTime? to=null)
         {
             IQueryable<Task> result = context
